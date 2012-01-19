@@ -47,5 +47,5 @@ Installing
 Alternatives
 ------------
 
-- GNU Parallel
+- GNU Parallel (+ s3cmd)
 
