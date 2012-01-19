@@ -35,7 +35,7 @@ Installing
 
 **Homebrew:**
 
-    $ brew install --HEAD https://raw.github.com/gist/xxxxxxxxx/s3dd.rb
+    $ brew install --HEAD https://raw.github.com/gist/1636830/s3dd.rb
 
 **Manually (assumes $HOME/local/bin, but you can change it to anything in your search path):**
 
