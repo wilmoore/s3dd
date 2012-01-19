@@ -139,27 +139,10 @@ echo "(xargs) flags    : -P${MAXPROCS}"
 # report directory stats
 ################################################################################
 
-LARGE_DIRSIZE=$(du -m $SOURCE_DIRECTORY | sort -nr | sed 1d| head -1 | cut -f1)
-LARGE_DIRNAME=$(du -m $SOURCE_DIRECTORY | sort -nr | sed 1d| head -1 | cut -f2)
+LARGE_DIRSIZE=$(du -m $SOURCE_DIRECTORY | sort -nr | sed 1d | head -1 | cut -f1)
+LARGE_DIRNAME=$(du -m $SOURCE_DIRECTORY | sort -nr | sed 1d | head -1 | cut -f2)
 
 echo "Largest Directory: ${LARGE_DIRSIZE}MB => ${LARGE_DIRNAME}"
-
-################################################################################
-# enumerate directories to figure out which directories to emulate
-################################################################################
-
-# pushd $SOURCE_DIRECTORY > /dev/null
-# EMULATE_KEYS=$(find . -type d | grep -Pv "[.]thumbs" | cut -d "/" -f 2- | grep -Pv "^[.]" | sort -n)
-# popd > /dev/null
-# 
-# OLDIFS=$IFS
-# IFS=$'\n'
-# for key in $EMULATE_KEYS
-# do
-#   echo "${key}"
-# done
-# IFS=$OLDIFS
-# exit
 
 ################################################################################
 # push to s3
