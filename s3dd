@@ -151,6 +151,3 @@ echo "Largest Directory: ${LARGE_DIRSIZE}MB => ${LARGE_DIRNAME}"
 cd $SOURCE_DIRECTORY
 time find . -maxdepth 1 | cut -d "/" -f 2 | grep -Pv "^[.]" | sort -n | xargs -I % -L1 -P${MAXPROCS} s3cmd sync --verbose --acl-public %/ s3://$TARGET_S3_BUCKET/%/
 
-echo ""
-echo "DONE"
-
