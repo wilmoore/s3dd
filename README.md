@@ -39,7 +39,7 @@ Installing
 
 **Manually (assumes $HOME/local/bin, but you can change it to anything in your search path):**
 
-    $ wget -c https://raw.github.com/wilmoore/composer-shellwrapper/master/composer -O $HOME/local/bin/s3dd
+    $ wget -c https://raw.github.com/Net-Results/s3dd/master/s3dd.sh -O $HOME/local/bin/s3dd
     $ chmod a+x !$
     $ which s3dd
 
