@@ -33,16 +33,23 @@ Requirements
 Installing
 ----------
 
-**Homebrew:**
+**Git**
 
-    $ brew install --HEAD https://raw.github.com/gist/1636830/s3dd.rb
+    % mkdir -p $HOME/local
+    % cd !$
+    % git clone https://github.com/Net-Results/s3dd.git
+    % chmod a+x bin/*
 
 **cURL**
 
-    % mkdir -p $HOME/local/s3dd   # this location is configurable, just don't forget to add this to your search path
+    % mkdir -p $HOME/local/s3dd   # this location is configurable, just don't forget to add this to your search path (or symlink to your 'bin' directory)
     % cd !$
     % curl -# -L https://github.com/Net-Results/s3dd/tarball/master | tar -xz --strip 1
     % chmod a+x bin/*
+
+**Homebrew:**
+
+    $ brew install --HEAD https://raw.github.com/gist/1636830/s3dd.rb
 
 
 Alternatives
