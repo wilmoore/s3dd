@@ -50,10 +50,10 @@ Installing
 Directories
 ------------
 
-s3 does not have true directories in the typical sense; however, directories can be simulated by creating a zero-length file with content type
-"binary/octet-stream". It is also recommended to append a "/" to the object name/key. This is not required, but will make your life easier.
+>   s3 does not have true directories in the typical sense; however, directories can be simulated by creating a zero-length file with content type
+>   "binary/octet-stream". It is also recommended to append a "/" to the object name/key. This is not required, but will make your life easier.
 
-s3dd includes another tool called **s3mkdirs** which scans a top-level directory and mirrors the directory structure to the given s3 bucket.
+`s3dd` includes another tool called `s3mkdirs` which scans a top-level directory and mirrors the directory structure to the given s3 bucket.
 
 **Invoking**
 
