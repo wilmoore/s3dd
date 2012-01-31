@@ -19,8 +19,8 @@ Usage Examples
     $ s3dd ~/images/client/logos client-logos-bucket
 
 **Advanced Usage (passing additional 'xargs' parameters)**
-
-    $ s3dd ~/images/client/logos client-logos-bucket -P40 # NOTE: this has not yet been implemented (I am happy to receive pull requests :)
+    > this has not yet been implemented (I am happy to receive pull requests :)
+    $ s3dd ~/images/client/logos client-logos-bucket -P40
 
 
 Requirements

@@ -12,7 +12,6 @@
 
 set -e
 set -o errexit
-set -o errtrace
 set -o nounset
 
 ################################################################################
@@ -34,7 +33,7 @@ MAXPROCS=45
 ################################################################################
 
 # correct # of arguments?
-if (($# != 2)); then
+if [ $# -ne 2 ]; then
     echo "s3mkdirs version $VERSION"
     echo ""
     echo "Usage  : s3mkdirs <source-path> <s3-bucket>"

@@ -33,7 +33,7 @@ MAXPROCS=45
 ################################################################################
 
 # correct # of arguments?
-if (($# != 2)); then
+if [ $# -ne 2 ]; then
     echo "s3dd version $VERSION"
     echo ""
     echo "Usage  : s3dd <source-path> <s3-bucket>"
