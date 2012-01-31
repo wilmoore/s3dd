@@ -1,9 +1,9 @@
 #!/usr/bin/env sh
 
 ################################################################################
-# name: s3dd
-# what: enumerates a directory of directories and syncs them to S3 in parallel
-# why : because sometimes you need to get a ton of files pushed to s3 in a hurry
+# name: s3mkdirs
+# what: enumerates a directory mirroring the directory structure to an s3 bucket
+# why : some tools need directory objects in S3 to simulate directory browsing
 ################################################################################
 
 ################################################################################
@@ -35,16 +35,16 @@ MAXPROCS=45
 
 # correct # of arguments?
 if (($# != 2)); then
-    echo "s3dd version $VERSION"
+    echo "s3mkdirs version $VERSION"
     echo ""
-    echo "Usage  : s3dd <source-path> <s3-bucket>"
-    echo "Example: s3dd /tmp/client/logos client-logo-assets-bucket"
+    echo "Usage  : s3mkdirs <source-path> <s3-bucket>"
+    echo "Example: s3mkdirs /tmp/client/logos client-logo-assets-bucket"
     exit 1
 fi
 
 # directory to enumerate
 SOURCE_DIRECTORY=$1
-# S3 target bucket to mirror to
+# s3 target bucket
 TARGET_S3_BUCKET=$2
 
 ################################################################################
@@ -136,15 +136,83 @@ echo "(xargs) flags    : -P${MAXPROCS}"
 # report directory stats
 ################################################################################
 
-LARGE_DIRSIZE=$(du -m $SOURCE_DIRECTORY | sort -nr | sed 1d | head -1 | cut -f1)
-LARGE_DIRNAME=$(du -m $SOURCE_DIRECTORY | sort -nr | sed 1d | head -1 | cut -f2)
+DIRECTORY_LIST=($(find $SOURCE_DIRECTORY -type d | sed "s@$SOURCE_DIRECTORY/@@" | sed "s@$SOURCE_DIRECTORY@@" | grep -vP '^$'))
+DIRECTORY_COUNT=${#DIRECTORY_LIST[@]}
 
-echo "Largest Directory: ${LARGE_DIRSIZE}MB => ${LARGE_DIRNAME}"
+echo "DIRECTORY COUNT  : ${DIRECTORY_COUNT}"
 
 ################################################################################
-# push to s3
+# check for access key
 ################################################################################
 
-cd $SOURCE_DIRECTORY
-time find . -maxdepth 1 | cut -d "/" -f 2 | grep -Pv "^[.]" | sort -n | xargs -I % -L1 -P${MAXPROCS} s3cmd sync --verbose --acl-public %/ s3://$TARGET_S3_BUCKET/%/
+declare -x ACCESS_KEY=$(s3cmd --dump-config | grep -P '^access_key' | cut -d' ' -f3)
+
+if [ -z "$ACCESS_KEY" ]; then
+  echo "You must set the 'ACCESS_KEY' via s3cmd or set the \$ACCESS_KEY environment variable"
+  exit 1
+fi
+
+################################################################################
+# check for secret key
+################################################################################
+
+declare -x SECRET_KEY=$(s3cmd --dump-config | grep -P '^secret_key' | cut -d' ' -f3)
+
+if [ -z "$SECRET_KEY" ]; then
+  echo "You must set the 'ACCESS_KEY' via s3cmd or set the \$ACCESS_KEY environment variable"
+  exit 1
+fi
+
+################################################################################
+# build policy document (json)
+################################################################################
+
+declare -x POLICY_EXP=$(date -v "+1d" +"%Y-%m-%dT%H:%M:%SZ")
+declare -x POLICY_DOC=$(printf '{"expiration": "%s", "conditions": [ {"bucket": "%s"}, ["starts-with", "$key", ""], {"acl": "public-read"}, ["starts-with", "$Content-Type", ""], ["content-length-range", 0, 1048576] ]}' ${POLICY_EXP} ${TARGET_S3_BUCKET})
+
+echo "ORIGINAL POLICY  : ${POLICY_DOC}"
+echo ""
+
+POLICY_B64=$(echo ${POLICY_DOC} | openssl base64 | tr -d "\n")
+
+echo "ENCODED DOCUMENT : ${POLICY_B64}"
+echo ""
+
+SIGNATURE=$(echo ${POLICY_DOC} | openssl base64 | tr -d "\n" | openssl sha1 -hmac "${SECRET_KEY}" -binary | openssl base64)
+
+echo "SIGNATURE        : ${SIGNATURE}"
+echo ""
+
+################################################################################
+# create directory function
+################################################################################
+
+function create_directory() {
+  curl -F "key=${2}/" \
+       -F "acl=public-read" \
+       -F "policy=$POLICY_B64" \
+       -F "signature=$SIGNATURE" \
+       -F "AWSAccessKeyId=$ACCESS_KEY" \
+       -F "Content-Type=binary/octet-stream" \
+       -F "file=@/dev/null" \
+  http://${1}.s3.amazonaws.com
+
+  if [[ ${?} == 0 ]]; then
+    echo "STATUS           : OK"
+  else
+    echo "STATUS           : FAILED"
+  fi
+
+  echo ""
+}
+
+################################################################################
+# create directories
+################################################################################
+
+for (( i = 0 ; i < DIRECTORY_COUNT ; i++ ))
+do
+  echo "ABOUT TO CREATE  : ${DIRECTORY_LIST[$i]}"
+  create_directory ${TARGET_S3_BUCKET} ${DIRECTORY_LIST[$i]}
+done
 
