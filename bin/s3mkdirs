@@ -199,7 +199,8 @@ echo ""
 ################################################################################
 
 function create_directory() {
-  curl -F "key=${2}/" \
+  curl -s \
+       -F "key=${2}/" \
        -F "acl=public-read" \
        -F "policy=$POLICY_B64" \
        -F "signature=$SIGNATURE" \

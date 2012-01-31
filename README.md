@@ -1,13 +1,6 @@
 s3dd: S3 directory dumper script with parallel execution
 ========================================================
 
-
-Enumerates a directory of directories and syncs them to S3.
-
-
-Summary
--------
-
 This utility was written to address the needs of those needing to quickly get a LOT of files into an S3 bucket. The S3cmd utility is great; however, there is no built-in functionality that will load files in parallel.
 
 
@@ -16,13 +9,13 @@ Usage Examples
 
 **Basic Usage**
 
-    $ s3dd ~/images/client/logos client-logos-bucket
+    % s3dd ~/images/client/logos client-logos-bucket
 
 **Advanced Usage (passing additional 'xargs' parameters)**
 
 >   this has not yet been implemented (I am happy to receive pull requests :)
 
-    $ s3dd ~/images/client/logos client-logos-bucket -P40
+    % s3dd ~/images/client/logos client-logos-bucket -P40
 
 
 Requirements
@@ -51,11 +44,26 @@ Installing
 
 **Homebrew:**
 
-    $ brew install --HEAD https://raw.github.com/gist/1636830/s3dd.rb
+    % brew install --HEAD https://raw.github.com/gist/1636830/s3dd.rb
 
 
-Alternatives
+Directories
 ------------
 
-- GNU Parallel (+ s3cmd)
+s3 does not have true directories in the typical sense; however, directories can be simulated by creating a zero-length file with content type
+"binary/octet-stream". It is also recommended to append a "/" to the object name/key. This is not required, but will make your life easier.
+
+s3dd includes another tool called **s3mkdirs** which scans a top-level directory and mirrors the directory structure to the given s3 bucket.
+
+**Invoking**
+
+    % s3mkdirs /mnt/clientlogos client-logos
+
+**DRY RUN (just reports the directories that "WOULD" be created)**
+
+    % DRYRUN=1 s3mkdirs /mnt/clientlogos client-logos
+
+**Logging to a file**
+
+    % s3mkdirs /mnt/clientlogos client-logos 2>&1 | tee /tmp/clientlogos.s3.log
 
