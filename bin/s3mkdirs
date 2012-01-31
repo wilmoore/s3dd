@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 ################################################################################
 # name: s3mkdirs
@@ -12,6 +12,7 @@
 
 set -e
 set -o errexit
+set -o errtrace
 set -o nounset
 
 ################################################################################
@@ -19,14 +20,14 @@ set -o nounset
 ################################################################################
 
 # executable path
-VERSION=0.0.2
+declare VERSION=0.1.0
 
 # executable path
-EXE_PATH=$(cd $(dirname $0);pwd)
+declare EXE_PATH=$(cd $(dirname $0);pwd)
 
 # (xargs) -P maxprocs
 # Parallel mode: run at most maxprocs invocations of utility at once.
-MAXPROCS=45
+declare MAXPROCS=45
 
 ################################################################################
 # argument handling
@@ -42,9 +43,9 @@ if [ $# -ne 2 ]; then
 fi
 
 # directory to enumerate
-SOURCE_DIRECTORY=$1
+declare SOURCE_DIRECTORY=$1
 # s3 target bucket
-TARGET_S3_BUCKET=$2
+declare TARGET_S3_BUCKET=$2
 
 ################################################################################
 # check for directory existence
@@ -60,7 +61,7 @@ fi
 # check for s3cmd
 ################################################################################
 
-declare -x S3CMD_BIN=$(which s3cmd)
+declare S3CMD_BIN=$(which s3cmd)
 
 if [ -z "$S3CMD_BIN" ]; then
     echo "Unfortunately, we can't continue until the S3cmd binary can be found in your path..."
@@ -71,7 +72,7 @@ fi
 # check for xargs
 ################################################################################
 
-declare -x XARGS_BIN=$(which xargs)
+declare XARGS_BIN=$(which xargs)
 
 if [ -z "$XARGS_BIN" ]; then
     echo "Unfortunately, we can't continue until the xargs binary can be found in your path..."
@@ -82,7 +83,7 @@ fi
 # check for sort
 ################################################################################
 
-declare -x SORT_BIN=$(which sort)
+declare SORT_BIN=$(which sort)
 
 if [ -z "$SORT_BIN" ]; then
     echo "Unfortunately, we can't continue until the sort binary can be found in your path..."
@@ -93,7 +94,7 @@ fi
 # check for grep
 ################################################################################
 
-declare -x GREP_BIN=$(which grep)
+declare GREP_BIN=$(which grep)
 
 if [ -z "$GREP_BIN" ]; then
     echo "Unfortunately, we can't continue until the grep binary can be found in your path..."
@@ -104,7 +105,7 @@ fi
 # check for find
 ################################################################################
 
-declare -x FIND_BIN=$(which find)
+declare FIND_BIN=$(which find)
 
 if [ -z "$FIND_BIN" ]; then
     echo "Unfortunately, we can't continue until the find binary can be found in your path..."
@@ -115,7 +116,7 @@ fi
 # check for cut
 ################################################################################
 
-declare -x CUT_BIN=$(which cut)
+declare CUT_BIN=$(which cut)
 
 if [ -z "$CUT_BIN" ]; then
     echo "Unfortunately, we can't continue until the cut binary can be found in your path..."
@@ -144,7 +145,7 @@ echo "DIRECTORY COUNT  : ${DIRECTORY_COUNT}"
 # check for access key
 ################################################################################
 
-declare -x ACCESS_KEY=$(s3cmd --dump-config | grep -P '^access_key' | cut -d' ' -f3)
+declare ACCESS_KEY=$(s3cmd --dump-config | grep -P '^access_key' | cut -d' ' -f3)
 
 if [ -z "$ACCESS_KEY" ]; then
   echo "You must set the 'ACCESS_KEY' via s3cmd or set the \$ACCESS_KEY environment variable"
@@ -155,7 +156,7 @@ fi
 # check for secret key
 ################################################################################
 
-declare -x SECRET_KEY=$(s3cmd --dump-config | grep -P '^secret_key' | cut -d' ' -f3)
+declare SECRET_KEY=$(s3cmd --dump-config | grep -P '^secret_key' | cut -d' ' -f3)
 
 if [ -z "$SECRET_KEY" ]; then
   echo "You must set the 'ACCESS_KEY' via s3cmd or set the \$ACCESS_KEY environment variable"
@@ -166,8 +167,8 @@ fi
 # build policy document (json)
 ################################################################################
 
-declare -x POLICY_EXP=$(date -v "+1d" +"%Y-%m-%dT%H:%M:%SZ")
-declare -x POLICY_DOC=$(printf '{"expiration": "%s", "conditions": [ {"bucket": "%s"}, ["starts-with", "$key", ""], {"acl": "public-read"}, ["starts-with", "$Content-Type", ""], ["content-length-range", 0, 1048576] ]}' ${POLICY_EXP} ${TARGET_S3_BUCKET})
+declare POLICY_EXP=$(date -v "+1d" +"%Y-%m-%dT%H:%M:%SZ")
+declare POLICY_DOC=$(printf '{"expiration": "%s", "conditions": [ {"bucket": "%s"}, ["starts-with", "$key", ""], {"acl": "public-read"}, ["starts-with", "$Content-Type", ""], ["content-length-range", 0, 1048576] ]}' ${POLICY_EXP} ${TARGET_S3_BUCKET})
 
 echo "ORIGINAL POLICY  : ${POLICY_DOC}"
 echo ""

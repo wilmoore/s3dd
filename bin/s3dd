@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 ################################################################################
 # name: s3dd
@@ -12,6 +12,7 @@
 
 set -e
 set -o errexit
+set -o errtrace
 set -o nounset
 
 ################################################################################
@@ -19,14 +20,14 @@ set -o nounset
 ################################################################################
 
 # executable path
-VERSION=0.0.2
+declare VERSION=0.1.0
 
 # executable path
-EXE_PATH=$(cd $(dirname $0);pwd)
+declare EXE_PATH=$(cd $(dirname $0);pwd)
 
 # (xargs) -P maxprocs
 # Parallel mode: run at most maxprocs invocations of utility at once.
-MAXPROCS=45
+declare MAXPROCS=45
 
 ################################################################################
 # argument handling
@@ -42,9 +43,9 @@ if [ $# -ne 2 ]; then
 fi
 
 # directory to enumerate
-SOURCE_DIRECTORY=$1
-# S3 target bucket to mirror to
-TARGET_S3_BUCKET=$2
+declare SOURCE_DIRECTORY=$1
+# s3 target bucket
+declare TARGET_S3_BUCKET=$2
 
 ################################################################################
 # check for directory existence
@@ -60,7 +61,7 @@ fi
 # check for s3cmd
 ################################################################################
 
-declare -x S3CMD_BIN=$(which s3cmd)
+declare S3CMD_BIN=$(which s3cmd)
 
 if [ -z "$S3CMD_BIN" ]; then
     echo "Unfortunately, we can't continue until the S3cmd binary can be found in your path..."
@@ -71,7 +72,7 @@ fi
 # check for xargs
 ################################################################################
 
-declare -x XARGS_BIN=$(which xargs)
+declare XARGS_BIN=$(which xargs)
 
 if [ -z "$XARGS_BIN" ]; then
     echo "Unfortunately, we can't continue until the xargs binary can be found in your path..."
@@ -82,7 +83,7 @@ fi
 # check for sort
 ################################################################################
 
-declare -x SORT_BIN=$(which sort)
+declare SORT_BIN=$(which sort)
 
 if [ -z "$SORT_BIN" ]; then
     echo "Unfortunately, we can't continue until the sort binary can be found in your path..."
@@ -93,7 +94,7 @@ fi
 # check for grep
 ################################################################################
 
-declare -x GREP_BIN=$(which grep)
+declare GREP_BIN=$(which grep)
 
 if [ -z "$GREP_BIN" ]; then
     echo "Unfortunately, we can't continue until the grep binary can be found in your path..."
@@ -104,7 +105,7 @@ fi
 # check for find
 ################################################################################
 
-declare -x FIND_BIN=$(which find)
+declare FIND_BIN=$(which find)
 
 if [ -z "$FIND_BIN" ]; then
     echo "Unfortunately, we can't continue until the find binary can be found in your path..."
@@ -115,7 +116,7 @@ fi
 # check for cut
 ################################################################################
 
-declare -x CUT_BIN=$(which cut)
+declare CUT_BIN=$(which cut)
 
 if [ -z "$CUT_BIN" ]; then
     echo "Unfortunately, we can't continue until the cut binary can be found in your path..."
