@@ -25,6 +25,9 @@ declare VERSION=0.1.0
 # executable path
 declare EXE_PATH=$(cd $(dirname $0);pwd)
 
+# dry run?
+declare ISDRYRUN=${DRYRUN-}
+
 # (xargs) -P maxprocs
 # Parallel mode: run at most maxprocs invocations of utility at once.
 declare MAXPROCS=45
@@ -175,7 +178,8 @@ else
   declare POLICY_EXP=$(date -v "+1d" +"%Y-%m-%dT00:00:00Z")
 fi
 
-declare POLICY_DOC=$(printf '{"expiration": "%s", "conditions": [ {"bucket": "%s"}, ["starts-with", "$key", ""], {"acl": "public-read"}, ["starts-with", "$Content-Type", ""], ["content-length-range", 0, 1048576] ]}' ${POLICY_EXP} ${TARGET_S3_BUCKET})
+declare POLICY_DOC=$(printf '{"expiration": "%s", "conditions": [ {"bucket": "%s"}, ["starts-with", "$key", ""], {"acl": "public-read"}, ["starts-with", "$Content-Type", "binary/octet-stream"], ["content-length-range", 0, 0] ]}' ${POLICY_EXP} ${TARGET_S3_BUCKET})
+#declare POLICY_DOC=$(printf '{"expiration": "%s", "conditions": [ {"bucket": "%s"}, ["starts-with", "$key", ""], {"acl": "public-read"}, ["starts-with", "$Content-Type", "binary/octet-stream"], ["content-length-range", 0, 1048576] ]}' ${POLICY_EXP} ${TARGET_S3_BUCKET})
 
 echo "ORIGINAL POLICY  : ${POLICY_DOC}"
 echo ""
@@ -220,6 +224,9 @@ function create_directory() {
 for (( i = 0 ; i < DIRECTORY_COUNT ; i++ ))
 do
   echo "ABOUT TO CREATE  : ${DIRECTORY_LIST[$i]}"
-  create_directory ${TARGET_S3_BUCKET} ${DIRECTORY_LIST[$i]}
+
+  if [[ -z ${ISDRYRUN} ]]; then
+    create_directory ${TARGET_S3_BUCKET} ${DIRECTORY_LIST[$i]}
+  fi
 done
 
