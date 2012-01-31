@@ -42,7 +42,7 @@ Installing
     % mkdir -p $HOME/local/s3dd   # this location is configurable, just don't forget to add this to your search path
     % cd !$
     % curl -# -L https://github.com/Net-Results/s3dd/tarball/master | tar -xz --strip 1
-    % chmod a+x !$
+    % chmod a+x bin/*
 
 
 Alternatives
