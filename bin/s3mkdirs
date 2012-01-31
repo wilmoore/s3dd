@@ -19,7 +19,7 @@ set -o nounset
 ################################################################################
 
 # executable path
-VERSION=0.0.1
+VERSION=0.0.2
 
 # executable path
 EXE_PATH=$(cd $(dirname $0);pwd)
