@@ -37,11 +37,12 @@ Installing
 
     $ brew install --HEAD https://raw.github.com/gist/1636830/s3dd.rb
 
-**Manually (assumes $HOME/local/bin, but you can change it to anything in your search path):**
+**cURL**
 
-    $ wget -c https://raw.github.com/Net-Results/s3dd/master/s3dd -O $HOME/local/bin/s3dd
-    $ chmod a+x !$
-    $ which s3dd
+    % mkdir -p $HOME/local/s3dd   # this location is configurable, just don't forget to add this to your search path
+    % cd !$
+    % curl -# -L https://github.com/Net-Results/s3dd/tarball/master | tar -xz --strip 1
+    % chmod a+x !$
 
 
 Alternatives
