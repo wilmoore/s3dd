@@ -167,7 +167,14 @@ fi
 # build policy document (json)
 ################################################################################
 
-declare POLICY_EXP=$(date -v "+1d" +"%Y-%m-%dT%H:%M:%SZ")
+declare IS_GNUDATE=$(date --version 2>/dev/null|head -n1|grep GNU)
+
+if [[ -n $IS_GNUDATE ]]; then
+  declare POLICY_EXP=$(date --utc -d '+1 day' +"%Y-%m-%dT00:00:00Z")
+else
+  declare POLICY_EXP=$(date -v "+1d" +"%Y-%m-%dT00:00:00Z")
+fi
+
 declare POLICY_DOC=$(printf '{"expiration": "%s", "conditions": [ {"bucket": "%s"}, ["starts-with", "$key", ""], {"acl": "public-read"}, ["starts-with", "$Content-Type", ""], ["content-length-range", 0, 1048576] ]}' ${POLICY_EXP} ${TARGET_S3_BUCKET})
 
 echo "ORIGINAL POLICY  : ${POLICY_DOC}"
